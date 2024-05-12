@@ -2,6 +2,7 @@
 Provides functions that handle input with various data types.
 """
 
+
 def number(prompt, type="i", min=None, max=None, size=1, separator=","):
     """
     Function for handling the input of an integer (or an array thereof), with optional min and max constraints.
@@ -34,11 +35,14 @@ def number(prompt, type="i", min=None, max=None, size=1, separator=","):
                     type_string = "real"
 
                 if min is not None and max is not None:
-                    prompt = f"--> Introduzca un número {type_string} en [{min}, {max}]: "
+                    prompt = f"--> Introduzca un número {
+                        type_string} en [{min}, {max}]: "
                 elif min is not None:
-                    prompt = f"--> Introduzca un número {type_string} mayor o igual que {min}: "
+                    prompt = f"--> Introduzca un número {
+                        type_string} mayor o igual que {min}: "
                 elif max is not None:
-                    prompt = f"--> Introduzca un número {type_string} menor o igual que {min}: "
+                    prompt = f"--> Introduzca un número {
+                        type_string} menor o igual que {min}: "
                 else:
                     prompt = f"--> Introduzca un número {type_string}: "
         return answer
@@ -76,11 +80,14 @@ def number(prompt, type="i", min=None, max=None, size=1, separator=","):
 
             except ValueError:
                 if min is not None and max is not None:
-                    prompt = f"--> Introduzca números {type_string} en [{min}, {max}]: "
+                    prompt = f"--> Introduzca números {
+                        type_string} en [{min}, {max}]: "
                 elif min is not None:
-                    prompt = f"--> Introduzca números {type_string} mayores o iguales que {min}: "
+                    prompt = f"--> Introduzca números {
+                        type_string} mayores o iguales que {min}: "
                 elif max is not None:
-                    prompt = f"--> Introduzca número {type_string} menores o iguales que {min}: "
+                    prompt = f"--> Introduzca número {
+                        type_string} menores o iguales que {min}: "
                 else:
                     prompt = f"--> Introduzca números {type_string}: "
 
