@@ -26,8 +26,9 @@ def solve_linear_prog(process):
         # \sum_{i=0}^{m} \sum_{k=1}^{K} y_{ik} p_{ij}(k)
         for origin_state in process.states:
             for decision in process.decisions:
-                constraints[state][dcn_amnt*origin_state + decision -
-                                   1] -= process.transition[decision][origin_state][state] if process.transition[decision][origin_state] is not None else 0
+                if process.transition[decision][origin_state] is not None:
+                    constraints[state][dcn_amnt*origin_state + decision -
+                                       1] -= process.transition[decision][origin_state][state]
 
     # Restricción de suma igual a 1 para todas las decisiones aplicables
     # \sum_{i=0}^{m} \sum_{k=1}^{K} y_{ik}
