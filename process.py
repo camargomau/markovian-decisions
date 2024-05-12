@@ -83,5 +83,5 @@ def define_transition(decisions, states, decision_applicability):
 
     return transition
 
-
-process = create_process()
+if __name__ == "__main__":
+    process = create_process()
