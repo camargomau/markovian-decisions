@@ -1,57 +1,52 @@
 from scipy import optimize
-from process import Process
-
-def linear_programming(process):
-	costs = []
-	for state in process.states:
-		for decision in process.costs[state][1:]:
-			if decision is None:
-				costs.append(float(0))
-			else:
-				costs.append(decision)
-
-	# \sum_{i=0}^{m} \sum_{k=1}^{K} y_{ik}
-	one_constraint = [1 for _ in costs]
-
-	constraints = [[] for _ in process.states]
-	# para j = 0, 1, …, m
-	for state in process.states:
-		# \sum_{k=1}^{K} y_{jk}
-		for decision in process.decisions:
-			if process.decision_applicability[decision][state]:
-				constraints[state].append(1)
-			else:
-				constraints[state].append(0)
-		# \sum_{i=0}^{m} \sum_{k=1}^{K} y_{ik} p_{ij}(k)
-		for origin_state in process.states:
-			for decision in process.decisions:
-				if process.transition[decision][origin_state] is None:
-					constraints[state].append(0 for _ in process.states)
-				else:
-					constraints[state].append(process.transition[decision][origin_state][state])
-
-	print(constraints)
 
 
+def solve_linear_programming(process):
+    # decision amount
+    dcn_amnt = len(process.decisions)
 
+    # Para la función objetivo
+    # \sum_{i=0}^{m} \sum_{k=1}^{K} c_{ik} y_{ik}
+    costs = []
+    for state in process.states:
+        for cost in process.costs[state][1:]:
+            costs.append(cost if cost is not None else float(0))
 
-ejemplo = Process(
-	states = [0, 1, 2, 3],
-	decisions = [1, 2, 3],
-	decision_applicability = [None,
-		 					  [True, True, True, False],
-							  [False, False, True, False],
-							  [False, True, True, True]],
+    # Para las restricciones explícitas
+    # Restricciones para cada estado
+    # j = 0, 1, …, m
+    constraints = [[0 for _ in costs] for _ in process.states]
+    for state in process.states:
+        # Suma de las y de tomar la decisión k en el estado j
+        # \sum_{k=1}^{K} y_{jk}
+        for decision in process.decisions:
+            constraints[state][dcn_amnt*state + decision -
+                               1] += 1 if process.decision_applicability[decision][state] else 0
+        # Suma ponderada de las y de tomar la decisión k en algún estado i anterior a j
+        # \sum_{i=0}^{m} \sum_{k=1}^{K} y_{ik} p_{ij}(k)
+        for origin_state in process.states:
+            for decision in process.decisions:
+                constraints[state][dcn_amnt*origin_state + decision -
+                                   1] -= process.transition[decision][origin_state][state] if process.transition[decision][origin_state] is not None else 0
 
-	costs = [[None, 0.0, None, None],
-			 [None, 1000.0, None, 3000.0],
-			 [None, 4000.0, 6000.0, 6000.0],
-			 [None, None, None, 6000.0]],
+    # Restricción de suma igual a 1 para todas las decisiones aplicables
+    # \sum_{i=0}^{m} \sum_{k=1}^{K} y_{ik}
+    one_constraint = [0 for _ in costs]
+    for state in process.states:
+        for decision in process.decisions:
+            if process.decision_applicability[decision][state]:
+                one_constraint[dcn_amnt*state + decision-1] = 1
 
-	transition = [None,
-			      [[0.0, 0.875, 0.0625, 0.0625], [0.0, 0.75, 0.125, 0.125], [0.0, 0.0, 0.5, 0.5], None],
-				  [None, None, [0.0, 1.0, 0.0, 0.0], None],
-				  [None, [1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0]]]
-)
+    # Unión de todas las restricciones explícitas
+    constraints.insert(0, one_constraint)
 
-linear_programming(ejemplo)
+    # Vector b
+    constraint_vector = [1] + [0 for _ in process.states]
+
+    # Resolución del PPL mediante scipy.optimize.linprog, que utiliza HiGHS
+    solved = optimize.linprog(
+        c=costs, A_eq=constraints, b_eq=constraint_vector)
+
+    # Falta binarizar los valores de solved.x dividéndolos entre \sum_{k=1}^{K} y_ik
+    # solved.fun es Z óptima
+    return solved.x, solved.fun

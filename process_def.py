@@ -1,20 +1,39 @@
-import input_functions as inp
+import input_func as inp
 
 
 class Process:
+    """
+    Class for a Markovian decision process, with states, decisions, costs, etc.
+    """
+
     def __init__(self, states, decisions, decision_applicability, costs, transition):
+        # Listas con los números de estados y decisiones
+        # Estados inicia en 0, decisiones en 1
         self.states = states
         self.decisions = decisions
 
+        # Lista de listas binarias que indican si una decisión es aplicable en un estado en concreto
+        # decision_applicability[decision][state]
         self.decision_applicability = decision_applicability
+
+        # Matriz de costos; costs[state][decision]
         self.costs = costs
 
+        # Lista de matrices de transición para cada decisión
+        # transition[decision][origin_state][target_state]
         self.transition = transition
 
+        # ¿Posiblemente útil?
+        # ¿Posiblemente para guardar todas las políticas viables?
+        # ¿Posiblemente para enumeración exhaustiva y mejoramiento de políticas?
         self.policies = []
 
 
 def create_process():
+    """
+    CLI creation of a Process object
+    """
+
     # Estados y decisiones
     states_amount = inp.number(
         "• Introduzca la cantidad de estados que tiene el proceso (empiezan en 0): ", min_value=0)
@@ -36,6 +55,10 @@ def create_process():
 
 
 def define_decision_applicability(decisions, states):
+    """
+    CLI definition of Process.decision_applicability
+    """
+
     all_decisions = inp.boolean(
         "\n• ¿Todas las decisiones son aplicables para todos los estados? [S]í, [N]o: ", "S", "N")
 
@@ -54,9 +77,13 @@ def define_decision_applicability(decisions, states):
 
 
 def define_costs(decisions, states, decision_applicability):
+    """
+    CLI definition of Process.costs
+    """
+
     costs = [[None] + [None for _ in decisions] for _ in states]
 
-    # Donde no hay un costo, hay None. Nótese que un costo de 0 != None
+    # Donde no hay un costo aplicable, hay None. Nótese que un costo de 0 != None
     for state in states:
         print(f"\n• Costos en el estado {state}")
         for decision in decisions:
@@ -68,10 +95,14 @@ def define_costs(decisions, states, decision_applicability):
 
 
 def define_transition(decisions, states, decision_applicability):
+    """
+    CLI definition of Process.transition
+    """
+
     transition = [None] + [[[] if decision_applicability[decision]
                             [state] else None for state in states] for decision in decisions]
 
-    # Si una decisión no es aplicable en un estado, la matriz tiene columna None
+    # Si una decisión no es aplicable en un estado, la matriz tiene renglón None
     for decision in decisions:
         print(f"\n• Matriz de probabilidades de transición correspondiente a la decisión {
               decision}")
@@ -82,6 +113,7 @@ def define_transition(decisions, states, decision_applicability):
                                                          max_value=1, size=len(states))
 
     return transition
+
 
 if __name__ == "__main__":
     process = create_process()
