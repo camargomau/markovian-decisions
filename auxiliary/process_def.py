@@ -1,4 +1,4 @@
-import input_func as inp
+import auxiliary.input_func as inp
 
 
 class Process:

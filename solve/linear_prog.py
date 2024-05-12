@@ -1,7 +1,7 @@
 from scipy import optimize
 
 
-def solve_linear_programming(process):
+def solve_linear_prog(process):
     # decision amount
     dcn_amnt = len(process.decisions)
 
