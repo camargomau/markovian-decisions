@@ -13,7 +13,14 @@ def number(prompt, type="i", min=None, max=None, size=1, separator=","):
                 if type == "i":
                     answer = int(input(prompt))
                 elif type == "f":
-                    answer = float(input(prompt))
+                    answer = input(prompt)
+
+                    if "/" in answer:
+                        num, den = answer.split("/")
+                        answer = float(num)/float(den)
+                    else:
+                        answer = float(answer)
+
                 if min is not None and answer < min:
                     raise ValueError
                 elif max is not None and answer > max:
@@ -27,13 +34,13 @@ def number(prompt, type="i", min=None, max=None, size=1, separator=","):
                     type_string = "real"
 
                 if min is not None and max is not None:
-                    prompt = f"-> Introduzca un número {type_string} en [{min}, {max}]: "
+                    prompt = f"--> Introduzca un número {type_string} en [{min}, {max}]: "
                 elif min is not None:
-                    prompt = f"-> Introduzca un número {type_string} mayor o igual que{min}: "
+                    prompt = f"--> Introduzca un número {type_string} mayor o igual que {min}: "
                 elif max is not None:
-                    prompt = f"-> Introduzca un número {type_string} menor o igual que {min}: "
+                    prompt = f"--> Introduzca un número {type_string} menor o igual que {min}: "
                 else:
-                    prompt = f"-> Introduzca un número {type_string}: "
+                    prompt = f"--> Introduzca un número {type_string}: "
         return answer
     else:
         while True:
@@ -44,34 +51,38 @@ def number(prompt, type="i", min=None, max=None, size=1, separator=","):
 
             answer = input(prompt).strip().split(separator)
             if size != 0 and len(answer) != size:
-                prompt = f"-> Introduzca exactamente {size} {type_string}: "
+                prompt = f"--> Introduzca exactamente {size} {type_string}: "
                 continue
 
             try:
                 answer_list = []
-                for num in answer:
+                for number in answer:
                     if type == "i":
-                        num = int(num)
+                        number = int(number)
                     elif type == "f":
-                        num = float(num)
+                        if "/" in number:
+                            num, den = number.split("/")
+                            number = float(num)/float(den)
+                        else:
+                            number = float(number)
 
-                    if min is not None and num < min:
+                    if min is not None and number < min:
                         raise ValueError
-                    elif max is not None and num > max:
+                    elif max is not None and number > max:
                         raise ValueError
-                    answer_list.append(num)
+                    answer_list.append(number)
 
                 break
 
             except ValueError:
                 if min is not None and max is not None:
-                    prompt = f"-> Introduzca números {type_string} en [{min}, {max}]: "
+                    prompt = f"--> Introduzca números {type_string} en [{min}, {max}]: "
                 elif min is not None:
-                    prompt = f"-> Introduzca números {type_string} mayores o iguales que{min}: "
+                    prompt = f"--> Introduzca números {type_string} mayores o iguales que {min}: "
                 elif max is not None:
-                    prompt = f"-> Introduzca número {type_string} menores o iguales que {min}: "
+                    prompt = f"--> Introduzca número {type_string} menores o iguales que {min}: "
                 else:
-                    prompt = f"-> Introduzca números {type_string}: "
+                    prompt = f"--> Introduzca números {type_string}: "
 
         return answer_list
 
@@ -84,7 +95,7 @@ def boolean(prompt, opt_1, opt_2):
 
     answer = input(prompt)
     while answer.upper() != opt_1 and answer.upper() != opt_2:
-        answer = input(f"-> Introduzca {opt_1} o {opt_2}: ")
+        answer = input(f"--> Introduzca {opt_1} o {opt_2}: ")
 
     if answer.upper() == opt_1:
         return True

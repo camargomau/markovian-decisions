@@ -1,27 +1,22 @@
-import input_types
+import input_functions as inp
 
 class Process:
-	def __init__(self, states, decisions, decision_applicability, costs):
+	def __init__(self, states, decisions, decision_applicability, costs, transition):
 		self.states = states
 		self.decisions = decisions
 
 		self.decision_applicability = decision_applicability
 		self.costs = costs
 
-		self.transition = [None] + [[[] if self.decision_applicability[decision][state] else None for state in self.states] for decision in self.decisions]
-		for decision in self.decisions:
-			print(f"Matriz de probabilidades de transición correspondiente a la decisión {decision}")
-			for state in self.states:
-				if self.decision_applicability[decision][state]:
-					self.transition[decision][state] = input(f"Columna que parte del estado {state} (separe con comas): ").split(",")
+		self.transition = transition
 
 		self.policies = []
 
 
 def create_process():
 	# Estados y decisiones
-	states_amount = input_types.number("• Introduzca la cantidad de estados que tiene el proceso (empiezan en 0): ", min=0)
-	decisions_amount = input_types.integer("• Introduzca la cantidad de decisiones que se pueden tomar (empiezan en 1): ", min=0)
+	states_amount = inp.number("• Introduzca la cantidad de estados que tiene el proceso (empiezan en 0): ", min=0)
+	decisions_amount = inp.number("• Introduzca la cantidad de decisiones que se pueden tomar (empiezan en 1): ", min=0)
 	states = [state for state in range(states_amount)]
 	decisions = [decision+1 for decision in range(decisions_amount)]
 
@@ -31,11 +26,14 @@ def create_process():
 	# Costos
 	costs = define_costs(decisions, states, decision_applicability)
 
-	return Process(states, decisions, decision_applicability, costs)
+	# Matrices de transición
+	transition = define_transition(decisions, states, decision_applicability)
+
+	return Process(states, decisions, decision_applicability, costs, transition)
 
 
 def define_decision_applicability(decisions, states):
-	all_decisions = input_types.boolean("\n• ¿Todas las decisiones son aplicables para todos los estados? [S]í, [N]o: ", "S", "N")
+	all_decisions = inp.boolean("\n• ¿Todas las decisiones son aplicables para todos los estados? [S]í, [N]o: ", "S", "N")
 
 	# Si todas las decisiones son aplicables, todo es True
 	if all_decisions:
@@ -44,7 +42,7 @@ def define_decision_applicability(decisions, states):
 	else:
 		decision_applicability = [None]
 		for decision in decisions:
-			state_list = input_types.number(f"--> Introduzca la lista de estados aplicables para la decisión {decision} (separe con comas): ", min=0, size=0)
+			state_list = inp.number(f"-> Introduzca la lista de estados aplicables para la decisión {decision} (separe con comas): ", min=0, size=0)
 			decision_applicability.append([True if state in state_list else False for state in states])
 		return decision_applicability
 
@@ -54,22 +52,24 @@ def define_costs(decisions, states, decision_applicability):
 
 	# Donde no hay un costo, hay None. Nótese que un costo de 0 != None
 	for state in states:
-		print(f"• Costos estando en el estado {state}")
+		print(f"\n• Costos en el estado {state}")
 		for decision in decisions:
 			if decision_applicability[decision][state]:
-				costs[state][decision] = input_types.number(f"-> Introduzca el costo de la decisión {decision}: ", type="f")
+				costs[state][decision] = inp.number(f"-> Introduzca el costo de la decisión {decision}: ", type="f")
 
 	return costs
+
 
 def define_transition(decisions, states, decision_applicability):
 	transition = [None] + [[[] if decision_applicability[decision][state] else None for state in states] for decision in decisions]
 
 	for decision in decisions:
-		print(f"• Matriz de probabilidades de transición correspondiente a la decisión {decision}")
+		print(f"\n• Matriz de probabilidades de transición correspondiente a la decisión {decision}")
 		for state in states:
 			if decision_applicability[decision][state]:
-				transition[decision][state] = input(f"Columna que parte del estado {state} (separe con comas): ").split(",")
+				transition[decision][state] = inp.number(f"-> Columna que parte del estado {state} (separe con comas): ", type="f", min=0, max=1, size=len(states))
 
+	return transition
 
 
 process = create_process()
