@@ -2,8 +2,7 @@
 Provides functions that handle input with various data types.
 """
 
-
-def integer(prompt, min=None, max=None, size=1, separator=","):
+def number(prompt, type="i", min=None, max=None, size=1, separator=","):
     """
     Function for handling the input of an integer (or an array thereof), with optional min and max constraints.
     """
@@ -11,7 +10,10 @@ def integer(prompt, min=None, max=None, size=1, separator=","):
     if size == 1:
         while True:
             try:
-                answer = int(input(prompt))
+                if type == "i":
+                    answer = int(input(prompt))
+                elif type == "f":
+                    answer = float(input(prompt))
                 if min is not None and answer < min:
                     raise ValueError
                 elif max is not None and answer > max:
@@ -19,26 +21,40 @@ def integer(prompt, min=None, max=None, size=1, separator=","):
                 break
 
             except ValueError:
+                if type == "i":
+                    type_string = "entero"
+                elif type == "f":
+                    type_string = "real"
+
                 if min is not None and max is not None:
-                    prompt = f"-> Introduzca un número entero en [{min}, {max}]: "
+                    prompt = f"-> Introduzca un número {type_string} en [{min}, {max}]: "
                 elif min is not None:
-                    prompt = f"-> Introduzca un número entero mayor o igual que{min}: "
+                    prompt = f"-> Introduzca un número {type_string} mayor o igual que{min}: "
                 elif max is not None:
-                    prompt = f"-> Introduzca un número entero menor o igual que {min}: "
+                    prompt = f"-> Introduzca un número {type_string} menor o igual que {min}: "
                 else:
-                    prompt = "-> Introduzca un número entero: "
+                    prompt = f"-> Introduzca un número {type_string}: "
         return answer
     else:
         while True:
+            if type == "i":
+                type_string = "enteros"
+            elif type == "f":
+                type_string = "reales"
+
             answer = input(prompt).strip().split(separator)
             if size != 0 and len(answer) != size:
-                prompt = f"-> Introduzca exactamente {size} enteros: "
+                prompt = f"-> Introduzca exactamente {size} {type_string}: "
                 continue
 
             try:
                 answer_list = []
                 for num in answer:
-                    num = int(num)
+                    if type == "i":
+                        num = int(num)
+                    elif type == "f":
+                        num = float(num)
+
                     if min is not None and num < min:
                         raise ValueError
                     elif max is not None and num > max:
@@ -49,32 +65,15 @@ def integer(prompt, min=None, max=None, size=1, separator=","):
 
             except ValueError:
                 if min is not None and max is not None:
-                    prompt = f"-> Introduzca números enteros en [{min}, {max}]: "
+                    prompt = f"-> Introduzca números {type_string} en [{min}, {max}]: "
                 elif min is not None:
-                    prompt = f"-> Introduzca números enteros mayores o iguales que{min}: "
+                    prompt = f"-> Introduzca números {type_string} mayores o iguales que{min}: "
                 elif max is not None:
-                    prompt = f"-> Introduzca número enteros menores o iguales que {min}: "
+                    prompt = f"-> Introduzca número {type_string} menores o iguales que {min}: "
                 else:
-                    prompt = "-> Introduzca números enteros: "
+                    prompt = f"-> Introduzca números {type_string}: "
 
         return answer_list
-
-
-
-def floating(prompt):
-    """
-    Function for handling the input of a float.
-    """
-
-    while True:
-        try:
-            answer = float(input(prompt))
-            break
-
-        except ValueError:
-            prompt = "-> Introduzca un número real: "
-
-    return answer
 
 
 def boolean(prompt, opt_1, opt_2):
