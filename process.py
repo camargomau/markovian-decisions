@@ -17,9 +17,9 @@ class Process:
 def create_process():
     # Estados y decisiones
     states_amount = inp.number(
-        "• Introduzca la cantidad de estados que tiene el proceso (empiezan en 0): ", min=0)
+        "• Introduzca la cantidad de estados que tiene el proceso (empiezan en 0): ", min_value=0)
     decisions_amount = inp.number(
-        "• Introduzca la cantidad de decisiones que se pueden tomar (empiezan en 1): ", min=0)
+        "• Introduzca la cantidad de decisiones que se pueden tomar (empiezan en 1): ", min_value=0)
     states = [state for state in range(states_amount)]
     decisions = [decision+1 for decision in range(decisions_amount)]
 
@@ -47,7 +47,7 @@ def define_decision_applicability(decisions, states):
         decision_applicability = [None]
         for decision in decisions:
             state_list = inp.number(f"-> Introduzca la lista de estados aplicables para la decisión {
-                                    decision} (separe con comas): ", min=0, size=0)
+                                    decision} (separe con comas): ", min_value=0, size=0)
             decision_applicability.append(
                 [True if state in state_list else False for state in states])
         return decision_applicability
@@ -62,7 +62,7 @@ def define_costs(decisions, states, decision_applicability):
         for decision in decisions:
             if decision_applicability[decision][state]:
                 costs[state][decision] = inp.number(
-                    f"-> Introduzca el costo de la decisión {decision}: ", type="f")
+                    f"-> Introduzca el costo de la decisión {decision}: ", number_type="f")
 
     return costs
 
@@ -78,7 +78,8 @@ def define_transition(decisions, states, decision_applicability):
         for state in states:
             if decision_applicability[decision][state]:
                 transition[decision][state] = inp.number(f"-> Columna que parte del estado {
-                                                         state} (separe con comas): ", type="f", min=0, max=1, size=len(states))
+                                                         state} (separe con comas): ", number_type="f", min_value=0,
+                                                         max_value=1, size=len(states))
 
     return transition
 

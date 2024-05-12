@@ -3,7 +3,7 @@ Provides functions that handle input with various data types.
 """
 
 
-def number(prompt, type="i", min=None, max=None, size=1, separator=","):
+def number(prompt, number_type="i", min_value=None, max_value=None, size=1, separator=","):
     """
     Function for handling the input of an integer (or an array thereof), with optional min and max constraints.
     """
@@ -11,9 +11,9 @@ def number(prompt, type="i", min=None, max=None, size=1, separator=","):
     if size == 1:
         while True:
             try:
-                if type == "i":
+                if number_type == "i":
                     answer = int(input(prompt))
-                elif type == "f":
+                elif number_type == "f":
                     answer = input(prompt)
 
                     if "/" in answer:
@@ -22,35 +22,35 @@ def number(prompt, type="i", min=None, max=None, size=1, separator=","):
                     else:
                         answer = float(answer)
 
-                if min is not None and answer < min:
+                if min_value is not None and answer < min_value:
                     raise ValueError
-                elif max is not None and answer > max:
+                elif max_value is not None and answer > max_value:
                     raise ValueError
                 break
 
             except ValueError:
-                if type == "i":
+                if number_type == "i":
                     type_string = "entero"
-                elif type == "f":
+                elif number_type == "f":
                     type_string = "real"
 
-                if min is not None and max is not None:
+                if min_value is not None and max_value is not None:
                     prompt = f"--> Introduzca un número {
-                        type_string} en [{min}, {max}]: "
-                elif min is not None:
+                        type_string} en [{min_value}, {max_value}]: "
+                elif min_value is not None:
                     prompt = f"--> Introduzca un número {
-                        type_string} mayor o igual que {min}: "
-                elif max is not None:
+                        type_string} mayor o igual que {min_value}: "
+                elif max_value is not None:
                     prompt = f"--> Introduzca un número {
-                        type_string} menor o igual que {min}: "
+                        type_string} menor o igual que {min_value}: "
                 else:
                     prompt = f"--> Introduzca un número {type_string}: "
         return answer
     else:
         while True:
-            if type == "i":
+            if number_type == "i":
                 type_string = "enteros"
-            elif type == "f":
+            elif number_type == "f":
                 type_string = "reales"
 
             answer = input(prompt).strip().split(separator)
@@ -61,33 +61,33 @@ def number(prompt, type="i", min=None, max=None, size=1, separator=","):
             try:
                 answer_list = []
                 for number in answer:
-                    if type == "i":
+                    if number_type == "i":
                         number = int(number)
-                    elif type == "f":
+                    elif number_type == "f":
                         if "/" in number:
                             num, den = number.split("/")
                             number = float(num)/float(den)
                         else:
                             number = float(number)
 
-                    if min is not None and number < min:
+                    if min_value is not None and number < min_value:
                         raise ValueError
-                    elif max is not None and number > max:
+                    elif max_value is not None and number > max_value:
                         raise ValueError
                     answer_list.append(number)
 
                 break
 
             except ValueError:
-                if min is not None and max is not None:
+                if min_value is not None and max_value is not None:
                     prompt = f"--> Introduzca números {
-                        type_string} en [{min}, {max}]: "
-                elif min is not None:
+                        type_string} en [{min_value}, {max_value}]: "
+                elif min_value is not None:
                     prompt = f"--> Introduzca números {
-                        type_string} mayores o iguales que {min}: "
-                elif max is not None:
+                        type_string} mayores o iguales que {min_value}: "
+                elif max_value is not None:
                     prompt = f"--> Introduzca número {
-                        type_string} menores o iguales que {min}: "
+                        type_string} menores o iguales que {min_value}: "
                 else:
                     prompt = f"--> Introduzca números {type_string}: "
 
