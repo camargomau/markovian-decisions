@@ -70,11 +70,6 @@ def interpret_linear_sol(process, raw_solution):
 
     # La política óptima es la decisión con 1 para cada estado
     optimal_policy = [binary_sol[state].index(float(1))+1 for state in process.states]
-    optimal_cost = 0
-    for state in process.states:
-        for decision in process.decisions:
-            # Sumar los costos de las decisiones óptimas
-            if optimal_policy[state] == decision:
-                optimal_cost += process.costs[state][decision]
 
-    return optimal_policy, optimal_cost
+	# raw_solution.fun es la Z óptima (min), el costo esperado para la política óptima
+    return optimal_policy, raw_solution.fun
