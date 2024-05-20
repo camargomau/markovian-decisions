@@ -48,7 +48,42 @@ def solve_linear_prog(process):
     solution = optimize.linprog(
         c=costs, A_eq=constraints, b_eq=constraint_vector)
 
-    return solution
+    return costs, constraints, constraint_vector, solution
+
+
+def print_model(process, costs, constraints, constraint_vector):
+    # Encabezado con "", "Y_01", "Y02", ..., "b"
+    header = "| {:^3} ".format("")
+    separator = "\n| {:-^3} ".format("")
+    for state in process.states:
+        for decision in process.decisions:
+            header += "| {:^9} ".format(f"Y_{state}{decision}")
+            separator += "| {:-^9} ".format("")
+    else:
+        header += "| {:^9} |".format("b")
+        separator += "| {:-^9} |".format("")
+
+    # función objetivo con "Z", costos
+    objective_func = "\n| {:^3} ".format("Z")
+    for cost in costs:
+        objective_func += "| {:^ 9.6g} ".format(cost)
+    else:
+        objective_func += "| {:^9} |".format("")
+
+    # Restricciones
+    constraint_print = [None for _ in constraints]
+    for i in range(len(constraints)):
+        constraint_print[i] = "\n| {:^3} ".format(f"R{i}")
+        for coeff in constraints[i]:
+            constraint_print[i] += "| {:^ 9.6g} ".format(coeff)
+        else:
+            constraint_print[i] += "| {:^ 9.6g} |".format(constraint_vector[i])
+
+    to_print = header + separator + objective_func
+    for constraint in constraint_print:
+        to_print += constraint
+
+    print(to_print)
 
 
 def interpret_linear_sol(process, raw_solution):
@@ -73,3 +108,11 @@ def interpret_linear_sol(process, raw_solution):
 
 	# raw_solution.fun es la Z óptima (min), el costo esperado para la política óptima
     return optimal_policy, raw_solution.fun
+
+
+def main(process):
+    costs, constraints, constraint_vector, solution = solve_linear_prog(process)
+    print_model(process, costs, constraints, constraint_vector)
+
+    print(interpret_linear_sol(process, solution))
+    input()

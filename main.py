@@ -1,6 +1,53 @@
+import auxiliary.input_func as inp
 from auxiliary.misc import clear_screen, cover
-from auxiliary.process_def import Process
+from auxiliary.process_def import Process, create_process
 from solve.linear_prog import solve_linear_prog, interpret_linear_sol
+import solve.linear_prog as linear_prog
+
+def menu(process):
+    global method_choice
+    method_options = {
+        1: "Enumeración Exhaustiva",
+        2: "Programación Lineal",
+        3: "Mejoramiento de Políticas",
+        4: "Mejoramiento de Políticas con Descuento",
+        5: "Aproximaciones Sucesivas",
+
+        0: "Salir"
+    }
+
+    while True:
+        clear_screen()
+        print("Métodos disponibles:\n")
+        for opcion in method_options.keys():
+            print(f"{opcion} --- {method_options[opcion]}")
+
+        while True:
+            method_choice = inp.number("\n¿Qué método desea utilizar? ", min_value=0, max_value=5)
+            break
+
+        if method_choice == 1:
+            clear_screen()
+            # enumeration.main()
+            continue
+        elif method_choice == 2:
+            clear_screen()
+            linear_prog.main(process)
+            continue
+        elif method_choice == 3:
+            clear_screen()
+            # improvement.main()
+            continue
+        elif method_choice == 4:
+            clear_screen()
+            # improvement_disc.main()
+            continue
+        elif method_choice == 5:
+            clear_screen()
+            # approximations.main()
+            continue
+        elif method_choice == 0:
+            break
 
 if __name__ == "__main__":
     # Ejemplo de las máquinas con deterioro visto durante el curso
@@ -36,65 +83,13 @@ if __name__ == "__main__":
                      [1.0, 0.0, 0.0, 0.0]]]
     )
 
-solucion_lineal = solve_linear_prog(ejemplo)
-print(interpret_linear_sol(ejemplo, solucion_lineal))
+    cover()
+    # process = create_process()
+    # menu(process)
+    menu(ejemplo)
 
 """
-def menu():
-    global eleccion_metodo
-    opciones_metodos = {
-        1: "Método de Lagrange",
-        2: "Método de Hermite",
-        3: "Método de Splines",
-        4: "Método de Simpson 1/3",
-        5: "Método de Simpson 3/8",
-
-        0: "Salir"
-    }
-
-    while True:
-        clear_screen()
-        print("Métodos disponibles:\n")
-        for opcion in opciones_metodos.keys():
-            print(f"{opcion} --- {opciones_metodos[opcion]}")
-
-        while True:
-            try:
-                eleccion_metodo = int(input("\n¿Qué método desea utilizar? "))
-            except:
-                print("\nIntroduzca un número entero.")
-                continue
-
-            if (eleccion_metodo >= 0) and (eleccion_metodo < len(opciones_metodos.keys())):
-                break
-            else:
-                print(
-                    f"\nIntroduzca un número entre 0 y {len(opciones_metodos.keys())-1}.")
-
-        if eleccion_metodo == 1:
-            clear_screen()
-            lagrange.main()
-            continue
-        elif eleccion_metodo == 2:
-            clear_screen()
-            hermite.main()
-            continue
-        elif eleccion_metodo == 3:
-            clear_screen()
-            splines.main()
-            continue
-        elif eleccion_metodo == 4:
-            clear_screen()
-            simpson_13.main()
-            continue
-        elif eleccion_metodo == 5:
-            clear_screen()
-            simpson_38.main()
-            continue
-        elif eleccion_metodo == 0:
-            break
-
 if __name__ == "__main__":
-    cover()
-    menu()
+solucion_lineal = solve_linear_prog(ejemplo)
+print(interpret_linear_sol(ejemplo, solucion_lineal))
 """

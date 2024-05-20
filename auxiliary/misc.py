@@ -12,7 +12,7 @@ def cover():
              "Matemáticas Aplicadas y Computación\n",
              "{:-^47}\n".format(""),
              "Proyecto Final",
-             "Procesos Markovianos de Solución\n",
+             "Procesos Markovianos de Decisión\n",
              "Burciaga Piña Erick Osvaldo",
              "Camargo Badillo Luis Mauricio",
 			 "Gudiño Romero Miguel Ángel",
