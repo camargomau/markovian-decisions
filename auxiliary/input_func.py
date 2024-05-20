@@ -3,6 +3,12 @@ Provides functions that handle input with various data types.
 """
 
 
+# prompt es el string que se imprime en pantalla
+# number_type "i" es un entero, "f" es un flotante
+# min_value da el valor mínimo que puede ser introducido
+# max_value da el valor máximo que puede ser introducido
+# size es el tamaño del arreglo que va a ser leído; si es 1, solo se lee un valor
+# separator es el caracter que separa los valores, en caso de introducir un arreglo
 def number(prompt, number_type="i", min_value=None, max_value=None, size=1, separator=","):
     """
     Function for handling the input of an integer (or an array thereof), with optional min and max constraints.
@@ -94,10 +100,14 @@ def number(prompt, number_type="i", min_value=None, max_value=None, size=1, sepa
         return answer_list
 
 
+# prompt es el string que se imprime en pantalla
+# opt_1 es una sola letra mayúscula que representa una de las dos opciones posibles
+# opt_2 es la otra opción
+# e.g. opt_1="S" y opt_2="N" para un sí o no (S/N)
 def boolean(prompt, opt_1, opt_2):
     """
     Function for handling a boolean input;
-    opt_1 and opt_2 are single letters each
+    opt_1 and opt_2 are single uppercase letters each
     """
 
     answer = input(prompt)
