@@ -1,7 +1,7 @@
 import auxiliary.input_func as inp
 from auxiliary.misc import clear_screen, cover
 from auxiliary.process_def import Process, create_process
-from solve.linear_prog import solve_linear_prog, interpret_linear_sol
+# from solve.linear_prog import solve_linear_prog, interpret_linear_sol
 import solve.linear_prog as linear_prog
 
 def menu(process):
