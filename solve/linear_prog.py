@@ -1,4 +1,6 @@
 from scipy import optimize
+from numpy import round as rnd
+from prettytable import PrettyTable
 
 class Model:
     def __init__(self, process):
@@ -50,12 +52,46 @@ class Model:
         self.costs = costs
         self.constraints = constraints
         self.constraint_vector = constraint_vector
+
+        self.table = PrettyTable()
+        self.table.float_format = ".6f"
+
         self.raw_solution = None
         self.optimal_policy = None
         self.optimal_cost = None
         self.y_sol_matrix = list(list())
+        self.binary_sol_matrix = list(list())
 
     def __str__(self):
+        self.generate_table()
+        return self.table.get_string()
+
+    def generate_table(self):
+        # Encabezado con "", "Y_01", "Y02", ..., "b"
+        field_names = [""]
+        for state in self.states:
+            for decision in self.decisions:
+                field_names.append(f"Y_{state}{decision}")
+        field_names.append("b")
+        self.table.field_names = field_names
+
+        # función objetivo con "Z", costos
+        objective_func = ["Z"]
+        for cost in self.costs:
+            objective_func.append(round(cost, 4))
+        objective_func.append("")
+        self.table.add_row(objective_func)
+
+        # Restricciones
+        complete_constraints = list()
+        for i in range(len(self.constraints)):
+            row = [f"r{i}"]
+            for coeff in self.constraints[i]:
+                row.append(round(coeff, 6))
+            row.append(round(self.constraint_vector[i], 6))
+            complete_constraints.append(row)
+        self.table.add_rows(complete_constraints)
+
         # Encabezado con "", "Y_01", "Y02", ..., "b"
         header = "| {:^3} ".format("")
         separator = "\n| {:-^3} ".format("")
@@ -75,21 +111,20 @@ class Model:
             objective_func += "| {:^9} |".format("")
 
         # Restricciones
-        constraint_print = [None for _ in self.constraints]
+        complete_constraints = [None for _ in self.constraints]
         for i in range(len(self.constraints)):
-            constraint_print[i] = "\n| {:^3} ".format(f"R{i}")
+            complete_constraints[i] = "\n| {:^3} ".format(f"R{i}")
             for coeff in self.constraints[i]:
-                constraint_print[i] += "| {:^ 9.6g} ".format(coeff)
+                complete_constraints[i] += "| {:^ 9.6g} ".format(coeff)
             else:
-                constraint_print[i] += "| {:^ 9.6g} |".format(self.constraint_vector[i])
+                complete_constraints[i] += "| {:^ 9.6g} |".format(self.constraint_vector[i])
 
         model_string = header + separator + objective_func
-        for constraint in constraint_print:
+        for constraint in complete_constraints:
             model_string += constraint
 
-        return model_string
 
-    def solve_model(self):
+    def solve(self):
         # Resolución del PPL mediante scipy.optimize.linprog, que utiliza HiGHS
         solution = optimize.linprog(
             c=self.costs, A_eq=self.constraints, b_eq=self.constraint_vector)
@@ -99,7 +134,13 @@ class Model:
         self.optimal_cost = solution.fun
 
 
-    def interpret_model_solution(self):
+    def interpret_solution(self):
+        """
+        Method that interprets the solution;
+        returns the array for the optimal policy,
+        a matrix with the optimal values for D_ik,
+        and a matrix with the optimal values for Y_ik
+        """
         dcn_amnt = len(self.decisions)
 
         # optimize.linprog retorna un objeto cuyo atributo x es el vector solución
@@ -114,13 +155,28 @@ class Model:
                 row_sum[state] += value
 
         # Binarizar la solución dividiendo entre \sum_{k=1}^{K} y_ik
-        binary_sol = [[y_sol_matrix[state][decision]/row_sum[state] for decision in range(dcn_amnt)] for state in self.states]
+        binary_sol_matrix = [[y_sol_matrix[state][decision]/row_sum[state] for decision in range(dcn_amnt)] for state in self.states]
 
         # La política óptima es la decisión con 1 para cada estado
-        optimal_policy = [binary_sol[state].index(float(1))+1 for state in self.states]
+        optimal_policy = [binary_sol_matrix[state].index(float(1))+1 for state in self.states]
 
         self.optimal_policy = optimal_policy
         self.y_sol_matrix = y_sol_matrix
+        self.binary_sol_matrix = binary_sol_matrix
+
+
+    def print_solution(self):
+        y_ik_table, d_ik_table = PrettyTable(), PrettyTable()
+        y_ik_table.add_rows([[rnd(val, 6) for val in row] for row in self.y_sol_matrix])
+        d_ik_table.add_rows(self.binary_sol_matrix)
+
+        print(f"\n• La política óptima es: {self.optimal_policy}")
+        print(f"\n• El costo de esta política es: {round(self.optimal_cost, 6)}")
+        print(f"\n• La matriz de las Y_ik es:\n")
+        print(y_ik_table.get_string(header=False))
+
+        print(f"\n• La matriz de las D_ik es:\n")
+        print(d_ik_table.get_string(header=False))
 
 
 def main(process):
@@ -129,10 +185,9 @@ def main(process):
     # Imprimir el modelo
     print(f"• El modelo de programación lineal es:\n\n{model}")
     # Resolver el modelo
-    model.solve_model()
+    model.solve()
+    # Interpretar la solución
+    model.interpret_solution()
+    model.print_solution()
 
-    model.interpret_model_solution()
-
-    print(model.y_sol_matrix)
-
-    input()
+    input("\nPresione cualquier tecla para regresar el menú de métodos.")
