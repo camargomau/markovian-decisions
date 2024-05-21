@@ -1,7 +1,7 @@
 import auxiliary.input_func as inp
 from auxiliary.misc import clear_screen, cover
 from auxiliary.process_def import Process, create_process
-# from solve.linear_prog import solve_linear_prog, interpret_linear_sol
+
 import solve.linear_prog as linear_prog
 
 def menu(process):
@@ -84,12 +84,9 @@ if __name__ == "__main__":
     )
 
     cover()
+
+    # Descomenta estas dos lineas para introducir cualquier otro systema
     # process = create_process()
     # menu(process)
+    # y comenta esta de abajo
     menu(ejemplo)
-
-"""
-if __name__ == "__main__":
-solucion_lineal = solve_linear_prog(ejemplo)
-print(interpret_linear_sol(ejemplo, solucion_lineal))
-"""

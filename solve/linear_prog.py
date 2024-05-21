@@ -2,6 +2,7 @@ from scipy import optimize
 from numpy import round as rnd
 from prettytable import PrettyTable
 
+
 class Model:
     def __init__(self, process):
         # decision amount
@@ -23,14 +24,14 @@ class Model:
             # \sum_{k=1}^{K} y_{jk}
             for decision in process.decisions:
                 constraints[state][dcn_amnt*state + decision -
-                                1] += 1 if process.decision_applicability[decision][state] else 0
+                                   1] += 1 if process.decision_applicability[decision][state] else 0
             # Suma ponderada de las y de tomar la decisión k en algún estado i anterior a j
             # \sum_{i=0}^{m} \sum_{k=1}^{K} y_{ik} p_{ij}(k)
             for origin_state in process.states:
                 for decision in process.decisions:
                     if process.transition[decision][origin_state] is not None:
                         constraints[state][dcn_amnt*origin_state + decision -
-                                        1] -= process.transition[decision][origin_state][state]
+                                           1] -= process.transition[decision][origin_state][state]
 
         # Restricción de suma igual a 1 para todas las decisiones aplicables
         # \sum_{i=0}^{m} \sum_{k=1}^{K} y_{ik}
@@ -117,12 +118,12 @@ class Model:
             for coeff in self.constraints[i]:
                 complete_constraints[i] += "| {:^ 9.6g} ".format(coeff)
             else:
-                complete_constraints[i] += "| {:^ 9.6g} |".format(self.constraint_vector[i])
+                complete_constraints[i] += "| {:^ 9.6g} |".format(
+                    self.constraint_vector[i])
 
         model_string = header + separator + objective_func
         for constraint in complete_constraints:
             model_string += constraint
-
 
     def solve(self):
         # Resolución del PPL mediante scipy.optimize.linprog, que utiliza HiGHS
@@ -132,7 +133,6 @@ class Model:
         # solution.fun es la Z óptima (min), el costo esperado para la política óptima
         self.raw_solution = solution
         self.optimal_cost = solution.fun
-
 
     def interpret_solution(self):
         """
@@ -146,7 +146,8 @@ class Model:
         # optimize.linprog retorna un objeto cuyo atributo x es el vector solución
         raw_sol_vector = self.raw_solution.x
         # Separar el vector solución en una matriz para un manejo simplificado de índices
-        y_sol_matrix = [raw_sol_vector[dcn_amnt*state:dcn_amnt*(state+1)] for state in self.states]
+        y_sol_matrix = [raw_sol_vector[dcn_amnt *
+                                       state:dcn_amnt*(state+1)] for state in self.states]
 
         # Sumar las soluciones para cada estado (renglón)
         row_sum = [0 for _ in self.states]
@@ -155,23 +156,26 @@ class Model:
                 row_sum[state] += value
 
         # Binarizar la solución dividiendo entre \sum_{k=1}^{K} y_ik
-        binary_sol_matrix = [[y_sol_matrix[state][decision]/row_sum[state] for decision in range(dcn_amnt)] for state in self.states]
+        binary_sol_matrix = [[y_sol_matrix[state][decision]/row_sum[state]
+                              for decision in range(dcn_amnt)] for state in self.states]
 
         # La política óptima es la decisión con 1 para cada estado
-        optimal_policy = [binary_sol_matrix[state].index(float(1))+1 for state in self.states]
+        optimal_policy = [binary_sol_matrix[state].index(
+            float(1))+1 for state in self.states]
 
         self.optimal_policy = optimal_policy
         self.y_sol_matrix = y_sol_matrix
         self.binary_sol_matrix = binary_sol_matrix
 
-
     def print_solution(self):
         y_ik_table, d_ik_table = PrettyTable(), PrettyTable()
-        y_ik_table.add_rows([[rnd(val, 6) for val in row] for row in self.y_sol_matrix])
+        y_ik_table.add_rows([[rnd(val, 6) for val in row]
+                            for row in self.y_sol_matrix])
         d_ik_table.add_rows(self.binary_sol_matrix)
 
         print(f"\n• La política óptima es: {self.optimal_policy}")
-        print(f"\n• El costo de esta política es: {round(self.optimal_cost, 6)}")
+        print(f"\n• El costo de esta política es: {
+              round(self.optimal_cost, 6)}")
         print(f"\n• La matriz de las Y_ik es:\n")
         print(y_ik_table.get_string(header=False))
 
