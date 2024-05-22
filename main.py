@@ -2,6 +2,7 @@ import auxiliary.input_func as inp
 from auxiliary.misc import clear_screen, cover
 from auxiliary.process_def import Process, create_process
 
+import solve.enumeration as enumeration
 import solve.linear_prog as linear_prog
 
 def menu(process):
@@ -28,7 +29,7 @@ def menu(process):
 
         if method_choice == 1:
             clear_screen()
-            # enumeration.main()
+            enumeration.main(process)
             continue
         elif method_choice == 2:
             clear_screen()

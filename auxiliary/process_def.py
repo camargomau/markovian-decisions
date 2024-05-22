@@ -1,5 +1,5 @@
 import auxiliary.input_func as inp
-
+from itertools import product
 
 class Process:
     """
@@ -27,6 +27,23 @@ class Process:
         # ¿Posiblemente para guardar todas las políticas viables?
         # ¿Posiblemente para enumeración exhaustiva y mejoramiento de políticas?
         self.policies = []
+
+
+    def generate_policies(self):
+        # Transponer la matriz decision_applicability para la aplicabilidad de decisiones por estado
+        # (originalmente da los estados aplicables para cada decisión)
+        # [1:] ya que la decisión 0 no existe
+        transposed_applicability = list(map(list, zip(*self.decision_applicability[1:])))
+
+        # Generar una matriz con _solo_ las decisiones aplicables en cada estado
+        applicable_decisions = []
+        for state_applicability in transposed_applicability:
+            applicable_decisions.append([decision for decision, applicable in enumerate(state_applicability, start=1) if applicable])
+
+        # Generar todas las políticas posibles con el producto cartesiano
+        policies = list(product(*applicable_decisions))
+
+        self.policies = policies
 
 
 def create_process():
