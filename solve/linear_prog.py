@@ -130,9 +130,16 @@ class Model:
         solution = optimize.linprog(
             c=self.costs, A_eq=self.constraints, b_eq=self.constraint_vector)
 
-        # solution.fun es la Z óptima (min), el costo esperado para la política óptima
-        self.raw_solution = solution
-        self.optimal_cost = solution.fun
+        # status = 0 cuando la optimización pudo ser concluida exitosamente
+        # = 1 iteration limit reached
+        # = 2 problem apperas to be infeasible
+        # = 3 problem appears to be unbounded
+        # = 4 numerical difficulties encountered
+        if solution.status == 0:
+            # solution.fun es la Z óptima (min), el costo esperado para la política óptima
+            self.raw_solution = solution
+            self.optimal_cost = solution.fun
+
 
     def interpret_solution(self):
         """
@@ -191,8 +198,11 @@ def main(process):
     print(f"• El modelo de programación lineal es:\n\n{model}")
     # Resolver el modelo
     model.solve()
-    # Interpretar la solución
-    model.interpret_solution()
-    model.print_solution()
+
+    # status = 0 cuando la optimización pudo ser concluida exitosamente
+    if model.solution.status == 1:
+        # Interpretar la solución
+        model.interpret_solution()
+        model.print_solution()
 
     input("\nPresione cualquier tecla para regresar el menú de métodos.")
