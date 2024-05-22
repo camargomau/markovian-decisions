@@ -52,7 +52,7 @@ def menu(process):
 
 if __name__ == "__main__":
     # Ejemplo de las máquinas con deterioro visto durante el curso
-    ejemplo = Process(
+    ejemplo_maquinas = Process(
         states=[0, 1, 2, 3],
         decisions=[1, 2, 3],
 
@@ -84,10 +84,76 @@ if __name__ == "__main__":
                      [1.0, 0.0, 0.0, 0.0]]]
     )
 
+    # Ejemplo de Drake y Josh
+    ejemplo_dj = Process(
+        states=[0, 1],
+        decisions=[1, 2],
+
+        decision_applicability=[None,
+                                [True, True],
+                                [True, True]],
+
+        costs=[[None, 0.0, 0.0],
+               [None, 1200.0, 1200.0]],
+
+        transition=[None,
+
+                    [[0.6, 0.4],
+                     [0.6, 0.4]],
+
+                    [[0.4, 0.6],
+                     [0.5, 0.5]]
+        ]
+    )
+
+    # Ejemplo de Poker del ejercicio de clase del 17 de abril
+    ejemplo_poker = Process(
+        states=[0, 1],
+        decisions=[1, 2],
+
+        decision_applicability=[None,
+                                [True, True],
+                                [True, True]],
+
+        costs=[[None, 75.0, 0.0],
+               [None, 14.0, 14.0]],
+
+        transition=[None,
+
+                    [[7/8, 1/8],
+                     [7/8, 1/8]],
+
+                    [[1/8, 7/8],
+                     [1/8, 7/8]]
+        ]
+    )
+
+    # Ejemplo de Poker del segundo parcial
+    ejemplo_poker_examen = Process(
+        states=[0, 1],
+        decisions=[1, 2],
+
+        decision_applicability=[None,
+                                [True, True],
+                                [True, True]],
+
+        costs=[[None, 45.0, 0.0],
+               [None, 23.0, 23.0]],
+
+        transition=[None,
+
+                    [[6/8, 2/8],
+                     [6/8, 2/8]],
+
+                    [[3/8, 5/8],
+                     [3/8, 5/8]]
+        ]
+    )
+
     cover()
 
     # Descomenta estas dos lineas para introducir cualquier otro systema
     # process = create_process()
     # menu(process)
     # y comenta esta de abajo
-    menu(ejemplo)
+    menu(ejemplo_maquinas)
