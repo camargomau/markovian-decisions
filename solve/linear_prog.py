@@ -79,7 +79,7 @@ class Model:
         # función objetivo con "Z", costos
         objective_func = ["Z"]
         for cost in self.costs:
-            objective_func.append(round(cost, 4))
+            objective_func.append(round(cost, 6))
         objective_func.append("")
         self.table.add_row(objective_func)
 
@@ -184,6 +184,7 @@ class Model:
 
 
 def main(process):
+    print("Programación Lineal\n")
     # Formular el modelo
     model = Model(process)
     # Imprimir el modelo

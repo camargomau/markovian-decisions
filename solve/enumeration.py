@@ -1,4 +1,5 @@
 from numpy import linalg
+from prettytable import PrettyTable
 
 def solve_steady_state(process, policy):
 	"""
@@ -44,15 +45,27 @@ def calculate_costs(process):
 
 	return expected_costs
 
+def print_policies_costs(process, optimal_policy, expected_costs):
+	table = PrettyTable()
+	table.field_names = ["", "Política", "Costo", "Óptima"]
+	for policy_i, policy in enumerate(process.policies):
+		if policy == optimal_policy:
+			table.add_row([policy_i, policy, round(expected_costs[policy_i], 6), "Óptima"])
+		else:
+			table.add_row([policy_i, policy, round(expected_costs[policy_i], 6), ""])
+
+	print(table)
+
+
 def main(process):
 	expected_costs = calculate_costs(process)
 
 	optimal_cost = min(expected_costs)
 	optimal_policy = process.policies[expected_costs.index(optimal_cost)]
 
-	print(optimal_cost, optimal_policy)
+	print("Enumeración Exhaustiva\n")
+	print_policies_costs(process, optimal_policy, expected_costs)
 
-	# Falta imprimir toda política y su costo
-	# y mostrar todo con un formato agradable
+	print(f"\nLa política óptima es R{process.policies.index(optimal_policy)} {optimal_policy} con un costo de {round(optimal_cost, 6)}")
 
-	input()
+	input("\nPresione cualquier tecla para regresar el menú de métodos.")
