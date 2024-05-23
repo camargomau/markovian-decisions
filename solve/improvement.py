@@ -78,31 +78,34 @@ def find_alt_policy(process, system_solution):
 
 # Llevar el funcionamiento del método; resolver sistema, mejorar si es necesario, etc.
 def improve(iter, process, current_policy):
-    # Resolver el sistema de las V_j (y g, sin descuento)
-    system_solution = solve_system(process, current_policy)
+    while True:
+        # Resolver el sistema de las V_j (y g, sin descuento)
+        system_solution = solve_system(process, current_policy)
 
-    # Agregar el renglón para la iteración actual
-    row = [iter] + [round(value, 6)
-                    for value in system_solution] + [current_policy]
-    table.add_row(row)
+        # Agregar el renglón para la iteración actual
+        row = [iter] + [round(value, 6)
+                        for value in system_solution] + [current_policy]
+        table.add_row(row)
 
-    # Encontrar una política alternativa a partir de los resultados
-    alt_policy = find_alt_policy(process, system_solution)
+        # Encontrar una política alternativa a partir de los resultados
+        alt_policy = find_alt_policy(process, system_solution)
 
-    # Si la política alternativa es distinta a la actual, continuar
-    if alt_policy != current_policy:
-        return improve(iter+1, process, alt_policy)
+        # Si la política alternativa es distinta a la actual, continuar
+        if alt_policy != current_policy:
+            iter += 1
+            current_policy = alt_policy
+        else:
+            # Si son iguales, entonces terminar
+            # Cuando es sin descuento, se imprime también g (costo a largo plazo)
+            if discount == 1:
+                row = [iter+1] + ["N/A" for _ in process.states] + \
+                    [round(system_solution[-1], 6), current_policy]
+            else:
+                if alt_policy == current_policy:
+                    row = [iter+1] + ["N/A" for _ in process.states] + [current_policy]
+            table.add_row(row)
+            break
 
-    # Si son iguales, entonces terminar
-    # Cuando es sin descuento, se imprime también g (costo a largo plazo)
-    if discount == 1:
-        row = [iter+1] + ["N/A" for _ in process.states] + \
-            [round(system_solution[-1], 6), current_policy]
-    else:
-        if alt_policy == current_policy:
-            row = [iter+1] + ["N/A" for _ in process.states] + [current_policy]
-
-    table.add_row(row)
     return alt_policy
 
 
