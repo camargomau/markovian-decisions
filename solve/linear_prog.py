@@ -93,38 +93,6 @@ class Model:
             complete_constraints.append(row)
         self.table.add_rows(complete_constraints)
 
-        # Encabezado con "", "Y_01", "Y02", ..., "b"
-        header = "| {:^3} ".format("")
-        separator = "\n| {:-^3} ".format("")
-        for state in self.states:
-            for decision in self.decisions:
-                header += "| {:^9} ".format(f"Y_{state}{decision}")
-                separator += "| {:-^9} ".format("")
-        else:
-            header += "| {:^9} |".format("b")
-            separator += "| {:-^9} |".format("")
-
-        # función objetivo con "Z", costos
-        objective_func = "\n| {:^3} ".format("Z")
-        for cost in self.costs:
-            objective_func += "| {:^ 9.6g} ".format(cost)
-        else:
-            objective_func += "| {:^9} |".format("")
-
-        # Restricciones
-        complete_constraints = [None for _ in self.constraints]
-        for i in range(len(self.constraints)):
-            complete_constraints[i] = "\n| {:^3} ".format(f"R{i}")
-            for coeff in self.constraints[i]:
-                complete_constraints[i] += "| {:^ 9.6g} ".format(coeff)
-            else:
-                complete_constraints[i] += "| {:^ 9.6g} |".format(
-                    self.constraint_vector[i])
-
-        model_string = header + separator + objective_func
-        for constraint in complete_constraints:
-            model_string += constraint
-
     def solve(self):
         # Resolución del PPL mediante scipy.optimize.linprog, que utiliza HiGHS
         solution = optimize.linprog(
