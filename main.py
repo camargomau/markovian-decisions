@@ -118,8 +118,8 @@ if __name__ == "__main__":
                                 [True, True],
                                 [True, True]],
 
-        costs=[[None, 75.0, 0.0],
-               [None, 14.0, 14.0]],
+        costs=[[None, 75.0, 14.0],
+               [None, 0.0, 14.0]],
 
         transition=[None,
 
@@ -140,8 +140,8 @@ if __name__ == "__main__":
                                 [True, True],
                                 [True, True]],
 
-        costs=[[None, 45.0, 0.0],
-               [None, 23.0, 23.0]],
+        costs=[[None, 45.0, 23.0],
+               [None, 0.0, 23.0]],
 
         transition=[None,
 
@@ -156,6 +156,7 @@ if __name__ == "__main__":
     cover()
     process = create_process()
     # process = ejemplo_maquinas
+    # process = ejemplo_poker_examen
 
     clear_screen()
     print(process)
