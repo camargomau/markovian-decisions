@@ -1,5 +1,6 @@
 import auxiliary.input_functions as inp
 from itertools import product
+from prettytable import PrettyTable
 
 
 class Process:
@@ -24,10 +25,36 @@ class Process:
         # transition[decision][origin_state][target_state]
         self.transition = transition
 
-        # ¿Posiblemente útil?
-        # ¿Posiblemente para guardar todas las políticas viables?
-        # ¿Posiblemente para enumeración exhaustiva y mejoramiento de políticas?
+        # Lista de todas las políticas viables; utilizada por enumeración exhaustiva
         self.policies = []
+
+    def __str__(self):
+        # Tabla de estados
+        state_table = PrettyTable()
+        state_table.add_column("Estado", self.states)
+        process_str = f"• Los estados son:\n\n{state_table}\n"
+
+        # Tabla de decisiones
+        decision_table = PrettyTable()
+        decision_table.field_names = ["Decisión", "Estados donde aplica"]
+        for decision in self.decisions:
+            decision_table.add_row([decision, [state for state, applicable in enumerate(self.decision_applicability[decision]) if applicable]])
+        process_str += f"\n• Las decisiones son:\n\n{decision_table}\n"
+
+        # Matriz de costos
+        cost_matrix = PrettyTable(header=False)
+        cost_matrix.add_rows([[round(cost, 6) if cost is not None else "N/A" for cost in state[1:]] for state in self.costs])
+        process_str += f"\n• Los costos son:\n\n{cost_matrix}\n\n"
+
+        transition_matrices = [None] + [PrettyTable(header=False) for decision in self.decisions]
+        for decision in self.decisions:
+            transition_matrices[decision].add_rows([row for row in self.transition[decision] if row is not None])
+
+        process_str += "\n• Las matrices de transición son:\n\n"
+        for decision in self.decisions:
+            process_str += f"-> k = {decision}\n{transition_matrices[decision]}\n\n"
+
+        return process_str
 
     def generate_policies(self):
         # Transponer la matriz decision_applicability para la aplicabilidad de decisiones por estado

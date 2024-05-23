@@ -153,9 +153,10 @@ if __name__ == "__main__":
     )
 
     cover()
-
-    # Descomenta estas dos lineas para introducir cualquier otro systema
     # process = create_process()
-    # menu(process)
-    # y comenta esta de abajo
-    menu(ejemplo_maquinas)
+    process = ejemplo_maquinas
+
+    print(process)
+    input("Presione enter para continuar al menú de métodos.")
+
+    menu(process)
