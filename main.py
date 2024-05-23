@@ -1,6 +1,6 @@
-import auxiliary.input_func as inp
-from auxiliary.misc import clear_screen, cover
-from auxiliary.process_def import Process, create_process
+import auxiliary.input_functions as inp
+from auxiliary.presentation import clear_screen, cover
+from auxiliary.process import Process, create_process
 
 import solve.enumeration as enumeration
 import solve.linear_prog as linear_prog

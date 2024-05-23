@@ -27,6 +27,3 @@ def cover():
 
     input()
     clear_screen()
-
-def welcome():
-    clear_screen()

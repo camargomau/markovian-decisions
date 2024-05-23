@@ -1,4 +1,4 @@
-import auxiliary.input_func as inp
+import auxiliary.input_functions as inp
 from numpy import linalg
 from prettytable import PrettyTable
 
