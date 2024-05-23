@@ -50,6 +50,7 @@ def menu(process):
             approximations.main(process)
             continue
         elif method_choice == 0:
+            clear_screen()
             break
 
 if __name__ == "__main__":
@@ -153,9 +154,10 @@ if __name__ == "__main__":
     )
 
     cover()
-    # process = create_process()
-    process = ejemplo_maquinas
+    process = create_process()
+    # process = ejemplo_maquinas
 
+    clear_screen()
     print(process)
     input("Presione enter para continuar al menú de métodos.")
 

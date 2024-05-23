@@ -43,12 +43,12 @@ class Process:
 
         # Matriz de costos
         cost_matrix = PrettyTable(header=False)
-        cost_matrix.add_rows([[round(cost, 6) if cost is not None else "N/A" for cost in state[1:]] for state in self.costs])
+        cost_matrix.add_rows([[round(cost, 6) if cost is not None else "" for cost in state[1:]] for state in self.costs])
         process_str += f"\n• Los costos son:\n\n{cost_matrix}\n\n"
 
         transition_matrices = [None] + [PrettyTable(header=False) for decision in self.decisions]
         for decision in self.decisions:
-            transition_matrices[decision].add_rows([row for row in self.transition[decision] if row is not None])
+            transition_matrices[decision].add_rows([row if row is not None else ["" for _ in self.states] for row in self.transition[decision] ])
 
         process_str += "\n• Las matrices de transición son:\n\n"
         for decision in self.decisions:
