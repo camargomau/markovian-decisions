@@ -110,6 +110,8 @@ def main(process, discounted):
     discount = 1
     if discounted:
         discount = inp.number("• Introduzca el descuento (del 0 al 1): ", number_type="f", min_value=0, max_value=1)
+        if discount == 1:
+            print("\n(descuento de 1: utilizando mejoramiento sin descuento)")
 
     # Tabla donde ir agregando los resultados de cada iteración
     global table
