@@ -4,6 +4,7 @@ from auxiliary.process_def import Process, create_process
 
 import solve.enumeration as enumeration
 import solve.linear_prog as linear_prog
+import solve.improvement as improvement
 
 def menu(process):
     global method_choice
@@ -37,11 +38,11 @@ def menu(process):
             continue
         elif method_choice == 3:
             clear_screen()
-            # improvement.main()
+            improvement.main(process, False)
             continue
         elif method_choice == 4:
             clear_screen()
-            # improvement_disc.main()
+            improvement.main(process, True)
             continue
         elif method_choice == 5:
             clear_screen()

@@ -200,7 +200,7 @@ def main(process):
     model.solve()
 
     # status = 0 cuando la optimización pudo ser concluida exitosamente
-    if model.solution.status == 1:
+    if model.raw_solution.status == 0:
         # Interpretar la solución
         model.interpret_solution()
         model.print_solution()
