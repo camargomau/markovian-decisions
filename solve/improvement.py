@@ -114,8 +114,21 @@ def main(process, discounted):
     print("Mejoramiento de políticas con descuento\n" if discounted else "Mejoramiento de políticas\n")
 
     # Solicitar la política inicial
-    initial_policy = inp.number("• Introduzca la política inicial (separe con comas): ",
-                                min_value=1, max_value=process.decisions[-1], size=len(process.states))
+    while True:
+        try:
+            initial_policy = inp.number("• Introduzca la política inicial (separe con comas): ",
+                                        min_value=1, max_value=process.decisions[-1], size=len(process.states))
+
+            # Revisar si todas las decisiones son viables
+            for index, decision in enumerate(initial_policy):
+                if not process.decision_applicability[decision][index]:
+                    print(
+                        f"--> La decision {decision} no es viable en el estado {index}.")
+                    raise ValueError
+
+            break
+        except:
+            print("--> Por favor, introduce una política viable.\n")
 
     # discount es 1 si se eligió el método estándar
     global discount
