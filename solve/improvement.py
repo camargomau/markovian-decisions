@@ -1,43 +1,10 @@
 import auxiliary.input_func as inp
 from numpy import linalg
 from prettytable import PrettyTable
-import solve.enumeration as enumeration
-from auxiliary.steady_state import calculate_policy_cost
-
-# Para mejoramiento sin descuento, resolver los sistemas de ecuaciones
-def solve_system_standard(process, current_policy):
-    solve_equations = []
-    solve_vector = []
-
-    # Lado izquiredo de las ecuaciones y vector b
-    for state in process.states:
-        decision_in_state = current_policy[state]
-        equation = []
-
-        # los primeros m+1 elementos corresponden a los coeficientes de las V_j para todo estado (j = target_state)
-        for target_state in process.states:
-            if target_state == state:
-                equation.append(process.transition[decision_in_state][state][target_state]-1)
-            else:
-                equation.append(process.transition[decision_in_state][state][target_state])
-
-        # el último corresponde al coeficiente de g
-        equation.append(-1)
-        solve_equations.append(equation)
-        # Los costos son escalares y van en b
-        solve_vector.append(-process.costs[state][decision_in_state])
-
-    # Se tiene la condición que la última V_m = 0
-    v_m_zero = [0 for _ in process.states[:-1]] + [1, 0]
-    solve_equations.append(v_m_zero)
-    solve_vector.append(0)
-
-    # Resolver el sistema con linalg.solve
-    return linalg.solve(solve_equations, solve_vector)
 
 
-# Para mejoramiento sin descuento, resolver los sistemas de ecuaciones
-def solve_system_discounted(process, current_policy, discount):
+# Resolver los sistemas de ecuaciones de las V_j (y g, sin descuento)
+def solve_system(process, current_policy):
     solve_equations = []
     solve_vector = []
 
@@ -53,16 +20,27 @@ def solve_system_discounted(process, current_policy, discount):
             else:
                 equation.append(discount*process.transition[decision_in_state][state][target_state])
 
+        # En el método estándar, g (costo a largo plazo) está en el sistema
+        if discount == 1:
+            # el último corresponde al coeficiente de g
+            equation.append(-1)
+
         solve_equations.append(equation)
         # Los costos son escalares y van en b
         solve_vector.append(-process.costs[state][decision_in_state])
+
+    # En el método estándar, se tiene la condición de que la última V_m = 0
+    if discount == 1:
+        v_m_zero = [0 for _ in process.states[:-1]] + [1, 0]
+        solve_equations.append(v_m_zero)
+        solve_vector.append(0)
 
     # Resolver el sistema con linalg.solve
     return linalg.solve(solve_equations, solve_vector)
 
 
-# Encontrar una política alternativa sin descuento
-def find_alternative_standard(process, system_solution):
+# Encontrar una política alternativa
+def find_alt_policy(process, system_solution):
     alt_policy = []
 
     # Definir la nueva decisión para cada estado
@@ -73,11 +51,17 @@ def find_alternative_standard(process, system_solution):
         for decision in process.decisions:
             if process.decision_applicability[decision][state]:
                 cost = process.costs[state][decision]
+
                 for target_state in process.states:
-                    if target_state == state:
-                        cost += (process.transition[decision][state][target_state]-1)*system_solution[target_state]
+                    # Sin descuento se suma -V_i
+                    if discount == 1:
+                        if target_state == state:
+                            cost += (process.transition[decision][state][target_state]-1)*system_solution[target_state]
+                        else:
+                            cost += (process.transition[decision][state][target_state])*system_solution[target_state]
                     else:
-                        cost += (process.transition[decision][state][target_state])*system_solution[target_state]
+                        cost += (discount*process.transition[decision][state][target_state])*system_solution[target_state]
+
                 costs_to_compare[decision] = cost
 
         # La decisión óptima se guarda en un diccionario con el costo como valor y la decisión correspondiente como key
@@ -87,70 +71,32 @@ def find_alternative_standard(process, system_solution):
     return alt_policy
 
 
-# Encontrar una política alternativa con descuento
-def find_alternative_discounted(process, system_solution, discount):
-    alt_policy = []
+# Llevar el funcionamiento del método; resolver sistema, mejorar si es necesario, etc.
+def improve(iter, process, current_policy):
+    # Resolver el sistema de las V_j (y g, sin descuento)
+    system_solution = solve_system(process, current_policy)
 
-    # Definir la nueva decisión para cada estado
-    for state in process.states:
-        costs_to_compare = {}
+    # Agregar el renglón para la iteración actual
+    row = [iter] + [round(value, 6) for value in system_solution] + [current_policy]
+    table.add_row(row)
 
-        # Comparar un costo por cada decisión
-        for decision in process.decisions:
-            if process.decision_applicability[decision][state]:
-                cost = process.costs[state][decision]
-                for target_state in process.states:
-                    cost += (discount*process.transition[decision][state][target_state])*system_solution[target_state]
-                costs_to_compare[decision] = cost
+    # Encontrar una política alternativa a partir de los resultados
+    alt_policy = find_alt_policy(process, system_solution)
 
-        # La decisión óptima se guarda en un diccionario con el costo como valor y la decisión correspondiente como key
-        optimal_decision = min(costs_to_compare, key=costs_to_compare.get)
-        alt_policy.append(optimal_decision)
+    # Si la política alternativa es distinta a la actual, continuar
+    if alt_policy != current_policy:
+        return improve(iter+1, process, alt_policy)
 
-    return alt_policy
-
-
-def improve(iter, process, current_policy, discount):
-    if discount is None:
-        system_solution = solve_system_standard(process, current_policy)
-
-        row = [iter] + [round(value, 6) for value in system_solution] + [current_policy, round(system_solution[-1], 6)]
-        table.add_row(row)
-
-        alt_policy = find_alternative_standard(process, system_solution)
-
-        if alt_policy == current_policy:
-            row = [iter+1] + ["N/A" for _ in range(len(process.states)+1)] + [current_policy, round(system_solution[-1], 6)]
-            table.add_row(row)
-            return alt_policy
-        else:
-            return improve(iter+1, process, alt_policy, discount)
+    # Si son iguales, entonces terminar
+    # Cuando es sin descuento, se imprime también g (costo a largo plazo)
+    if discount == 1:
+            row = [iter+1] + ["N/A" for _ in process.states] + [round(system_solution[-1], 6), current_policy]
     else:
-        # current_cost = calculate_policy_cost(process, current_policy)
-
-
-        system_solution = solve_system_discounted(process, current_policy, discount)
-
-        state = 0
-        decision = current_policy[state]
-        current_cost = process.costs[state][decision]
-        for target_state in process.states:
-            if target_state == state:
-                current_cost += discount*process.transition[decision][state][target_state]*system_solution[target_state]-1
-            else:
-                current_cost += discount*process.transition[decision][state][target_state]*system_solution[target_state]
-
-        row = [iter] + [round(value, 6) for value in system_solution] + [current_policy, round(current_cost, 6)]
-        table.add_row(row)
-
-        alt_policy = find_alternative_discounted(process, system_solution, discount)
-
         if alt_policy == current_policy:
-            row = [iter+1] + ["N/A" for _ in range(len(process.states))] + [current_policy, round(current_cost, 6)]
-            table.add_row(row)
-            return alt_policy
-        else:
-            return improve(iter+1, process, alt_policy, discount)
+            row = [iter+1] + ["N/A" for _ in process.states] + [current_policy]
+
+    table.add_row(row)
+    return alt_policy
 
 
 def main(process, discounted):
@@ -159,21 +105,21 @@ def main(process, discounted):
     # Solicitar la política inicial
     initial_policy = inp.number("• Introduzca la política inicial (separe con comas): ", min_value=1, max_value=process.decisions[-1], size=len(process.states))
 
-    # Tabla donde ir agregando los resultados de cada iteración
-    global table
-    table = PrettyTable()
-    if not discounted:
-        field_names = ["iter."] + [f"V{i}" for i in process.states] + ["g", "Política", "Costo"]
-    else:
-        field_names = ["iter."] + [f"V{i}" for i in process.states] + ["Política", "Costo"]
-    table.field_names = field_names
-
-
-    discount = None
+    # discount es 1 si se eligió el método estándar
+    global discount
+    discount = 1
     if discounted:
         discount = inp.number("• Introduzca el descuento (del 0 al 1): ", number_type="f", min_value=0, max_value=1)
 
-    optimal_policy = improve(1, process, initial_policy, discount)
+    # Tabla donde ir agregando los resultados de cada iteración
+    global table
+    table = PrettyTable()
+    field_names = ["iter."] + [f"V{i}" for i in process.states] + (["g (costo)"] if discount == 1 else []) + ["Política"]
+    table.field_names = field_names
 
-    print(table)
-    input()
+    optimal_policy = improve(1, process, initial_policy)
+
+    print(f"\n{table}")
+    print(f"\nLa política óptima es {optimal_policy}.")
+
+    input("\nPresione cualquier tecla para regresar el menú de métodos.")
