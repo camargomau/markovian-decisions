@@ -129,8 +129,10 @@ def main(process, discounted):
         (["g (costo)"] if discount == 1 else []) + ["Política"]
     table.field_names = field_names
 
+    # Encontrar la política óptima mejorando continuamente
     optimal_policy = improve(1, process, initial_policy)
 
+    # Imprimir tabla y resultado
     print(f"\n{table}")
     print(f"\nLa política óptima es {optimal_policy}.")
 

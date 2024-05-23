@@ -1,6 +1,7 @@
 from numpy import linalg
 from prettytable import PrettyTable
 
+
 def steady_state_solve(process, policy):
     """
     Solves for the steady state distributions given a process
@@ -23,6 +24,7 @@ def steady_state_solve(process, policy):
 
     # Resolver con numpy.linalg.solve
     return linalg.solve(solve_equations, solve_vector)
+
 
 def calculate_costs(process):
     """

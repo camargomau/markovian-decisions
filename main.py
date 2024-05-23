@@ -5,6 +5,7 @@ from auxiliary.process import Process, create_process
 import solve.enumeration as enumeration
 import solve.linear_prog as linear_prog
 import solve.improvement as improvement
+import solve.approximations as approximations
 
 def menu(process):
     global method_choice
@@ -46,7 +47,7 @@ def menu(process):
             continue
         elif method_choice == 5:
             clear_screen()
-            # approximations.main()
+            approximations.main(process)
             continue
         elif method_choice == 0:
             break

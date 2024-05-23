@@ -140,7 +140,6 @@ class Model:
             self.raw_solution = solution
             self.optimal_cost = solution.fun
 
-
     def interpret_solution(self):
         """
         Method that interprets the solution;
