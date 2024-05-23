@@ -88,4 +88,4 @@ def main(process):
     print(f"\nLa aproximación obtenida a la política óptima es {
           approximated_optimal_policy}")
 
-    input("\nPresione cualquier tecla para regresar el menú de métodos.")
+    input("\nPresione enter para regresar el menú de métodos.")

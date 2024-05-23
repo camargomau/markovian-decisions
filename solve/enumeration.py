@@ -78,4 +78,4 @@ def main(process):
     print(f"\nLa política óptima es R{process.policies.index(optimal_policy)} {
           optimal_policy} con un costo de {round(optimal_cost, 6)}")
 
-    input("\nPresione cualquier tecla para regresar el menú de métodos.")
+    input("\nPresione enter para regresar el menú de métodos.")

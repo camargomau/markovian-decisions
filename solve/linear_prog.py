@@ -172,4 +172,4 @@ def main(process):
         model.interpret_solution()
         model.print_solution()
 
-    input("\nPresione cualquier tecla para regresar el menú de métodos.")
+    input("\nPresione enter para regresar el menú de métodos.")

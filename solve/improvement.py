@@ -153,4 +153,4 @@ def main(process, discounted):
     print(f"\n{table}")
     print(f"\nLa política óptima es {optimal_policy}.")
 
-    input("\nPresione cualquier tecla para regresar el menú de métodos.")
+    input("\nPresione enter para regresar el menú de métodos.")
