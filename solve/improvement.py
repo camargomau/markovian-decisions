@@ -102,7 +102,8 @@ def improve(iter, process, current_policy):
                     [round(system_solution[-1], 6), current_policy]
             else:
                 if alt_policy == current_policy:
-                    row = [iter+1] + ["N/A" for _ in process.states] + [current_policy]
+                    row = [iter+1] + ["N/A" for _ in process.states] + \
+                        [current_policy]
             table.add_row(row)
             break
 
